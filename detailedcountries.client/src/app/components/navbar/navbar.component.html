@@ -1,0 +1,16 @@
+<nav>
+  <a class="nav-brand" routerLink="/">
+    <div class="brand-icon">🌍</div>
+    <div>
+      <div class="brand-text">Detailed</div>
+      <div class="brand-sub">Countries</div>
+    </div>
+  </a>
+
+  <div class="sep"></div>
+
+  <ul class="nav-links">
+    <li><a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
+    <li><a routerLink="/countries" routerLinkActive="active">Countries</a></li>
+  </ul>
+</nav>

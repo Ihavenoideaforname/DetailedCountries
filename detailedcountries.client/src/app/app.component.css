@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: sans-serif;
+  color: #2c3e4a;
+  background: #e8f4f8;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  background: #e8f4f8;
+  min-height: calc(100vh - 64px - 52px);
+  position: relative;
+  background-image: linear-gradient(rgba(74, 158, 190, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 158, 190, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}

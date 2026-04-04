@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+
+footer {
+  height: 52px;
+  background: rgba(205, 232, 242, 0.5);
+  border-top: 1px solid rgba(74, 158, 190, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+}
+
+.copyright {
+  font-size: 0.72rem;
+  font-weight: 300;
+  font-family: sans-serif;
+  color: #7a95a3;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
