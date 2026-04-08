@@ -6,7 +6,9 @@
 
     <div class="actions">
       <a routerLink="/countries" class="btn-primary">Browse Countries</a>
-      <button class="btn-secondary" (click)="openAddModal()">+ Add Country</button>
+      <button class="btn-secondary" (click)="showModal = true">Observe Countries</button>
     </div>
   </div>
 </div>
+
+<app-add-country-modal *ngIf="showModal" (closed)="showModal = false" (countryAdded)="onCountryAdded($event)"></app-add-country-modal>

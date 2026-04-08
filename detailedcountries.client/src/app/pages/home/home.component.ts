@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { CountryListItem } from '../../services/country.service';
 
 @Component({
   selector: 'app-home',
@@ -10,13 +11,14 @@ import { Title } from '@angular/platform-browser';
 export class HomeComponent {
   constructor(private titleService: Title) { }
 
-  title = 'Detailed Countries';
+  title = 'Detailed Countries - Home';
+  showModal = false;
 
   ngOnInit() {
     this.titleService.setTitle(this.title);
   }
 
-  openAddModal() {
-    console.log('Add button clicked');
+  onCountryAdded(country: CountryListItem) {
+    console.log('Added: ', country);
   }
 }

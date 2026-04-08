@@ -1,0 +1,37 @@
+<div class="overlay" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <h2 class="modal-title">Observe Country</h2>
+
+    <input class="search-input" type="text" placeholder="Search..." [(ngModel)]="searchQuery" />
+
+    <div class="list-wrapper">
+      <div *ngIf="loading" class="skeleton-list">
+        <div *ngFor="let i of skeletonRows" class="skeleton-row">
+          <div class="skeleton-flag"></div>
+          <div class="skeleton-name"></div>
+        </div>
+      </div>
+      <div *ngIf="error" class="state-msg error">{{ error }}</div>
+      <div *ngIf="!loading && !error && filtered.length === 0" class="state-msg">No countries found.</div>
+
+      <ul *ngIf="!loading && !error">
+        <li *ngFor="let country of filtered" class="country-row" [class.selected]="selected?.Code === country.Code" (click)="select(country)">
+          <img class="flag" [src]="country.Flag" [alt]="country.Alt" />
+          <span class="name">{{ country.Name }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <p *ngIf="addError" class="add-error">{{ addError }}</p>
+
+    <div class="modal-actions">
+      <button class="btn-close" (click)="close()">Close</button>
+      <button class="btn-observe" [disabled]="!selected || adding" (click)="add()">
+        <span *ngIf="!adding">Observe</span>
+        <span *ngIf="adding" class="spinner"></span>
+      </button>
+    </div>
+
+  </div>
+</div>
