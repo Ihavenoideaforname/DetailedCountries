@@ -1,4 +1,5 @@
 ﻿using DetailedCountries.Server.Models;
+using DetailedCountries.Server.Models.DTOs;
 using MongoDB.Driver;
 using System.Text.Json;
 
@@ -77,56 +78,52 @@ namespace DetailedCountries.Server.Services
 
                 foreach(var api in apiData.EnumerateArray())
                 {
-                    if(!api.TryGetProperty("cca3", out var cca3Prop))
+                    var countryItem = api.Deserialize<CountryListResponse>();
+
+                    if(countryItem is null)
                     {
-                        _logger.LogWarning("Skipping entry without cca3 code.");
+                        _logger.LogWarning("Skipping entry with invalid data format.");
                         continue;
                     }
 
-                    var cca3 = cca3Prop.GetString();
-
-                    if(string.IsNullOrWhiteSpace(cca3))
+                    if(string.IsNullOrWhiteSpace(countryItem.Cca3))
                     {
                         _logger.LogWarning("Skipping entry with empty cca3 code.");
                         continue;
                     }
 
-                    apiCodes.Add(cca3);
-
-                    var commonName = api.GetProperty("name").GetProperty("common").GetString();
-                    var flag = api.GetProperty("flags").GetProperty("svg").GetString();
-                    var flagAlt = api.GetProperty("flags").GetProperty("alt").GetString();
-
-                    if(commonName is null || flag is null || flagAlt is null)
+                    if(string.IsNullOrEmpty(countryItem.Name.Common) || string.IsNullOrEmpty(countryItem.Flags.Svg) || string.IsNullOrEmpty(countryItem.Flags.Alt))
                     {
-                        _logger.LogWarning("Skipping entry with missing name or flag for cca3: {Cca3}", cca3);
+                        _logger.LogWarning("Skipping entry with missing name or flag for cca3: {Cca3}", countryItem.Cca3);
                         continue;
                     }
 
-                    if(!dbDict.TryGetValue(cca3, out var existing))
+                    apiCodes.Add(countryItem.Cca3);
+
+                    if(!dbDict.TryGetValue(countryItem.Cca3, out var existing))
                     {
                         writes.Add(new InsertOneModel<CountryListItem>(
                             new CountryListItem
                             {
-                                Cca3 = cca3,
-                                CountryCommonName = commonName,
-                                CountryFlag = flag,
-                                FlagAltText = flagAlt
+                                Cca3 = countryItem.Cca3,
+                                CountryCommonName = countryItem.Name.Common,
+                                CountryFlag = countryItem.Flags.Svg,
+                                FlagAltText = countryItem.Flags.Alt
                             }));
 
                         inserted++;
                     }
-                    else if(existing.CountryCommonName != commonName || existing.CountryFlag != flag || existing.FlagAltText != flagAlt)
+                    else if(existing.CountryCommonName != countryItem.Name.Common || existing.CountryFlag != countryItem.Flags.Svg || existing.FlagAltText != countryItem.Flags.Alt)
                     {
                         writes.Add(new ReplaceOneModel<CountryListItem>(
                             Builders<CountryListItem>.Filter.Eq(x => x.Id, existing.Id),
                             new CountryListItem
                             {
                                 Id = existing.Id,
-                                Cca3 = cca3,
-                                CountryCommonName = commonName,
-                                CountryFlag = flag,
-                                FlagAltText = flagAlt
+                                Cca3 = countryItem.Cca3,
+                                CountryCommonName = countryItem.Name.Common,
+                                CountryFlag = countryItem.Flags.Svg,
+                                FlagAltText = countryItem.Flags.Alt
                             }
                         ));
 

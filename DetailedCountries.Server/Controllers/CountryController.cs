@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using DetailedCountries.Server.Models;
+using DetailedCountries.Server.Models.DTOs;
 using DetailedCountries.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
@@ -70,54 +71,37 @@ namespace DetailedCountries.Server.Controllers
                 return StatusCode(response.StatusCode, $"API error: {response.Data}, {response.Message}");
             }
 
-            var apiData = response.Data;
+            var country = new ObservedCountry();
 
-            if(!apiData.TryGetProperty("cca3", out var cca3Prop))
+            try
             {
-                return NotFound($"Country code: '{item.Cca3}' not found in API response.");
+                var countryData = response.Data.Deserialize<CountryBaseDataResponse>();
+
+                if(countryData is null || string.IsNullOrWhiteSpace(countryData.Cca3))
+                {
+                    return NotFound($"Country code: '{item.Cca3}' not found in API response.");
+                }
+
+                if(string.IsNullOrEmpty(countryData.Name.Common) || string.IsNullOrWhiteSpace(countryData.Name.Official))
+                {
+                    return NotFound($"Country name data for '{item.Cca3}' is incomplete in API response.");
+                }
+
+                if(string.IsNullOrEmpty(countryData.Flags.Svg) || string.IsNullOrEmpty(countryData.Flags.Alt))
+                {
+                    return NotFound($"Country flag data for '{item.Cca3}' is incomplete in API response.");
+                }
+
+                country.Cca3 = countryData.Cca3;
+                country.CountryCommonName = countryData.Name.Common;
+                country.CountryOfficialName = countryData.Name.Official;
+                country.CountryFlag = countryData.Flags.Svg;
+                country.FlagAltText = countryData.Flags.Alt;
             }
-
-            var cca3 = cca3Prop.GetString();
-
-            if(string.IsNullOrWhiteSpace(cca3))
+            catch(JsonException ex)
             {
-                return NotFound($"Country code: '{item.Cca3}' not found in API response.");
+                return StatusCode(500, $"Error parsing API response: {ex.Message}");
             }
-
-            if(!apiData.TryGetProperty("name", out var nameProp) || !nameProp.TryGetProperty("common", out var commonNameProp) || !nameProp.TryGetProperty("official", out var officialNameProp))
-            {
-                return NotFound($"Country name data for '{item.Cca3}' is incomplete in API response.");
-            }
-
-            var commonName = commonNameProp.GetString();
-            var officialName = officialNameProp.GetString();
-
-            if(string.IsNullOrWhiteSpace(commonName) || string.IsNullOrWhiteSpace(officialName))
-            {
-                return NotFound($"Country name data for '{item.Cca3}' is incomplete in API response.");
-            }
-
-            if(!apiData.TryGetProperty("flags", out var flagsProp) || !flagsProp.TryGetProperty("svg", out var flagProp) || !flagsProp.TryGetProperty("alt", out var altProp))
-            {
-                return NotFound($"Country flag data for '{item.Cca3}' is incomplete in API response.");
-            }
-
-            var flag = flagProp.GetString();
-            var altText = altProp.GetString();
-
-            if(string.IsNullOrWhiteSpace(flag) || string.IsNullOrWhiteSpace(altText))
-            {
-                return NotFound($"Country flag data for '{item.Cca3}' is incomplete in API response.");
-            }
-
-            var country = new ObservedCountry
-            {
-                Cca3 = cca3,
-                CountryCommonName = commonName,
-                CountryOfficialName = officialName,
-                CountryFlag = flag,
-                FlagAltText = altText
-            };
 
             await _countryService.AddObservedCountryAsync(country);
 
