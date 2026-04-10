@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { CountryListItem } from '../../services/country.service';
 
@@ -9,7 +10,7 @@ import { CountryListItem } from '../../services/country.service';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  constructor(private titleService: Title) { }
+  constructor(private router: Router, private titleService: Title) { }
 
   title = 'Detailed Countries - Home';
   showModal = false;
@@ -20,5 +21,6 @@ export class HomeComponent {
 
   onCountryAdded(country: CountryListItem) {
     console.log('Added: ', country);
+    this.router.navigate(['/countries']);
   }
 }

@@ -1,0 +1,52 @@
+<div class="page">
+  <div class="top-bar">
+    <input class="search-input" type="text" maxlength="200" placeholder="Search by name or code..."
+           [value]="searchQuery" (input)="onSearch($any($event.target).value)" />
+    <button class="btn-sort" (click)="toggleSort()">
+      <span>{{ sortOrder === 'asc' ? 'A → Z' : 'Z → A' }}</span>
+    </button>
+    <button class="btn-add" (click)="showAddModal = true">+ Observe Country</button>
+  </div>
+
+  <div *ngIf="error" class="message-box">
+    <p class="error-msg">{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error && allCountries.length === 0" class="message-box">
+    <div class="empty-state">
+      <div class="empty-globe">🌍</div>
+      <h2>No countries yet</h2>
+      <p>Start building your collection by observing countries.</p>
+      <button class="btn-add" (click)="showAddModal = true">+ Observe your first country</button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && allCountries.length > 0 && pagedCountries.length === 0" class="message-box">
+    <div class="empty-state">
+      <div class="empty-globe">🔍</div>
+      <h2>No results</h2>
+      <p>No countries match "{{ searchQuery }}".</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="grid">
+    <app-country-card *ngFor="let i of skeletonCards" [skeleton]="true" />
+  </div>
+
+  <div *ngIf="!loading && pagedCountries.length > 0" class="grid">
+    <app-country-card *ngFor="let country of pagedCountries" [country]="country" (delete)="openDelete($event)"
+                      (edit)="openEdit($event)" (explore)="explore($event)" />
+  </div>
+
+  <div *ngIf="totalPages > 1" class="pagination">
+    <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(1)">«</button>
+    <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">‹</button>
+    <button *ngFor="let p of pages" class="page-btn" [class.active]="p === currentPage" (click)="goToPage(p)">
+      {{ p }}
+    </button>
+    <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">›</button>
+    <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(totalPages)">»</button>
+  </div>
+</div>
+
+<app-add-country-modal *ngIf="showAddModal" (closed)="showAddModal = false" (countryAdded)="onCountryAdded($event)"/>

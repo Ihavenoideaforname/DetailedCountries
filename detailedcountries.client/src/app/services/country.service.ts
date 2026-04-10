@@ -27,7 +27,15 @@ export class CountryService {
     return this.http.get<CountryListItem[]>(`${this.apiUrl}/available`);
   }
 
-  observe(item: CountryListItem): Observable<ObservedCountry> {
-    return this.http.post<ObservedCountry>(`${this.apiUrl}/observe`, item);
+  getObserved(): Observable<ObservedCountry[]> {
+    return this.http.get<ObservedCountry[]>(`${this.apiUrl}/observed`);
+  }
+
+  getObservedByCode(code: string): Observable<ObservedCountry> {
+    return this.http.get<ObservedCountry>(`${this.apiUrl}/observed/${code}`);
+  }
+
+  observe(item: CountryListItem): Observable<CountryListItem> {
+    return this.http.post<CountryListItem>(`${this.apiUrl}/observe`, item);
   }
 }

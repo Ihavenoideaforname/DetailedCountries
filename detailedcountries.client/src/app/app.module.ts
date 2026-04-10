@@ -10,6 +10,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { AddCountryModalComponent } from './components/add-country-modal/add-country-modal.component';
+import { CountriesComponent } from './pages/countries/countries.component';
+import { CountryCardComponent } from './components/country-card/country-card.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +20,8 @@ import { AddCountryModalComponent } from './components/add-country-modal/add-cou
     NavbarComponent,
     FooterComponent,
     AddCountryModalComponent,
+    CountriesComponent,
+    CountryCardComponent,
   ],
   imports: [
     BrowserModule,

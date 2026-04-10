@@ -8,13 +8,11 @@ namespace DetailedCountries.Server.Services
     public class CountrySyncService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly HttpClient _httpClient;
         private readonly ILogger<CountrySyncService> _logger;
 
-        public CountrySyncService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, ILogger<CountrySyncService> logger)
+        public CountrySyncService(IServiceProvider serviceProvider, ILogger<CountrySyncService> logger)
         {
             _serviceProvider = serviceProvider;
-            _httpClient = httpClientFactory.CreateClient();
             _logger = logger;
         }
 

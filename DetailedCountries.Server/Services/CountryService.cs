@@ -13,6 +13,7 @@ namespace DetailedCountries.Server.Services
 
         // ObservedCountry collection methods
         Task<List<ObservedCountry>> GetAllObservedCountriesAsync();
+        Task<ObservedCountry> GetObservedCountryByCode(string cca3);
         Task AddObservedCountryAsync(ObservedCountry country);
     }
 
@@ -43,6 +44,9 @@ namespace DetailedCountries.Server.Services
 
         public async Task<List<ObservedCountry>> GetAllObservedCountriesAsync() =>
             await _observedCountryCollection.Find(_ => true).ToListAsync();
+
+        public async Task<ObservedCountry> GetObservedCountryByCode(string cca3) =>
+            await _observedCountryCollection.Find(c => c.Cca3 == cca3).FirstOrDefaultAsync();
 
         public async Task AddObservedCountryAsync(ObservedCountry country) =>
             await _observedCountryCollection.InsertOneAsync(country);

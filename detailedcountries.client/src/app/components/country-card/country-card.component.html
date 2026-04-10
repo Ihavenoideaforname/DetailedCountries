@@ -1,0 +1,34 @@
+<div class="card" [class.skeleton-card]="skeleton">
+  <ng-container *ngIf="skeleton">
+    <div class="card-top">
+      <div class="sk sk-flag"></div>
+      <div class="card-names" style="flex:1">
+        <div class="sk sk-text wide"></div>
+        <div class="sk sk-text narrow"></div>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <div class="sk sk-btn"></div>
+      <div class="sk sk-btn"></div>
+      <div class="sk sk-btn"></div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!skeleton && country">
+    <div class="card-top">
+      <img class="flag" [src]="country.Flag" [alt]="country.Alt" [title]="country.Alt" />
+
+      <div class="card-names">
+        <span class="common-name" [title]="country.Name">{{ country.Name }}</span>
+        <span class="official-name" [title]="country.OfficialName">{{ country.OfficialName }}</span>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button class="btn-delete" (click)="delete.emit(country)">Delete</button>
+      <button class="btn-edit" (click)="edit.emit(country)">Edit</button>
+      <button class="btn-explore" (click)="explore.emit(country)">Explore</button>
+    </div>
+  </ng-container>
+</div>

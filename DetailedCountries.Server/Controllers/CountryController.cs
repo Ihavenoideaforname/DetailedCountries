@@ -48,6 +48,55 @@ namespace DetailedCountries.Server.Controllers
             }
         }
 
+        [HttpGet("observed")]
+        public async Task<ActionResult<List<ObservedCountry>>> GetObservedCountries()
+        {
+            try
+            {
+                var observed = await _countryService.GetAllObservedCountriesAsync();
+                var sorted = observed?.OrderBy(c => c.CountryCommonName).ToList() ?? new List<ObservedCountry>() ?? new List<ObservedCountry>();
+               
+                return Ok(sorted);
+            }
+            catch(MongoException ex)
+            {
+                return StatusCode(503, $"Database unavailable: {ex.Message}");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("observed/{cca3}")]
+        public async Task<ActionResult<ObservedCountry>> GetObservedCountry(string cca3)
+        {
+            if(string.IsNullOrWhiteSpace(cca3))
+            {
+                return BadRequest("Country code is required.");
+            }
+
+            try
+            {
+                var country = await _countryService.GetObservedCountryByCode(cca3);
+
+                if(country is null)
+                {
+                    return NotFound($"No observed country found with code: {cca3}");
+                }
+
+                return Ok(country);
+            }
+            catch(MongoException ex)
+            {
+                return StatusCode(503, $"Database unavailable: {ex.Message}");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
+        }
+
         [HttpPost("observe")]
         public async Task<IActionResult> Observe([FromBody] CountryListItem item)
         {
