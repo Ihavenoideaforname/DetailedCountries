@@ -17,8 +17,9 @@
 
   <ng-container *ngIf="!skeleton && country">
     <div class="card-top">
-      <img class="flag" [src]="country.Flag" [alt]="country.Alt" [title]="country.Alt" />
-
+      <div class="flag-wrapper">
+        <img class="flag" [src]="country.Flag" [alt]="country.Alt" [title]="country.Alt" />
+      </div>
       <div class="card-names">
         <span class="common-name" [title]="country.Name">{{ country.Name }}</span>
         <span class="official-name" [title]="country.OfficialName">{{ country.OfficialName }}</span>
