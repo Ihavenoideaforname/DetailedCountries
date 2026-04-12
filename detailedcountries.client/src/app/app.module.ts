@@ -12,6 +12,8 @@ import { FooterComponent } from './components/footer/footer.component';
 import { AddCountryModalComponent } from './components/add-country-modal/add-country-modal.component';
 import { CountriesComponent } from './pages/countries/countries.component';
 import { CountryCardComponent } from './components/country-card/country-card.component';
+import { EditCountryModalComponent } from './components/edit-country-modal/edit-country-modal.component';
+import { RemoveCountryModalComponent } from './components/remove-country-modal/remove-country-modal.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import { CountryCardComponent } from './components/country-card/country-card.com
     AddCountryModalComponent,
     CountriesComponent,
     CountryCardComponent,
+    EditCountryModalComponent,
+    RemoveCountryModalComponent
   ],
   imports: [
     BrowserModule,

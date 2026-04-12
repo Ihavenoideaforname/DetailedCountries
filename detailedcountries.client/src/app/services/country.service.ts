@@ -38,4 +38,12 @@ export class CountryService {
   observe(item: CountryListItem): Observable<CountryListItem> {
     return this.http.post<CountryListItem>(`${this.apiUrl}/observe`, item);
   }
+
+  editObserved(code: string, updated: CountryListItem): Observable<CountryListItem> {
+    return this.http.put<CountryListItem>(`${this.apiUrl}/edit/${code}`, updated);
+  }
+
+  removeObserved(code: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/remove/${code}`);
+  }
 }

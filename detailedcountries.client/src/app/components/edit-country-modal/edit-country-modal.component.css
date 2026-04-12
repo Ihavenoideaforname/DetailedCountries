@@ -126,7 +126,7 @@ ul {
   color: #c0392b;
 }
 
-.add-error {
+.edit-error {
   margin: 0.75rem 0 0;
   text-align: center;
   font-family: sans-serif;
@@ -157,7 +157,7 @@ ul {
   background: rgba(74, 158, 190, 0.07);
 }
 
-.btn-observe {
+.btn-edit {
   padding: 0.55rem 1.5rem;
   background: #4a9ebe;
   border: none;
@@ -174,12 +174,12 @@ ul {
   transition: opacity 0.2s;
 }
 
-.btn-observe:disabled {
+.btn-edit:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.btn-observe:not(:disabled):hover {
+.btn-edit:not(:disabled):hover {
   opacity: 0.88;
 }
 
@@ -262,4 +262,36 @@ ul {
   100% {
     background-position: -200% 0;
   }
+}
+
+.current-country {
+  font-family: sans-serif;
+  font-size: 0.85rem;
+  color: #7a95a3;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-self: center;
+}
+
+.current-country-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.current-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-height: 20px;
+  max-height: 32px;
+  background: #f0f8fc;
+  border-radius: 4px;
+  border: 1px solid rgba(74, 158, 190, 0.1);
+  padding: 1px;
+  overflow: hidden;
 }

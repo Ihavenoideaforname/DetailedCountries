@@ -55,7 +55,7 @@ namespace DetailedCountries.Server.Controllers
             {
                 var observed = await _countryService.GetAllObservedCountriesAsync();
                 var sorted = observed?.OrderBy(c => c.CountryCommonName).ToList() ?? new List<ObservedCountry>() ?? new List<ObservedCountry>();
-               
+
                 return Ok(sorted);
             }
             catch(MongoException ex)
@@ -105,25 +105,25 @@ namespace DetailedCountries.Server.Controllers
                 return BadRequest("Invalid country data.");
             }
 
-            var observed = await _countryService.GetAllObservedCountriesAsync();
-            bool alreadyExists = observed?.Any(o => o.Cca3 == item.Cca3) ?? false;
-
-            if(alreadyExists)
-            {
-                return Conflict($"{item.Cca3} is already in your collection.");
-            }
-
-            var response = await _apiService.GetCountryBaseData(item.Cca3);
-
-            if(!response.Success || response.Data.ValueKind != JsonValueKind.Object)
-            {
-                return StatusCode(response.StatusCode, $"API error: {response.Data}, {response.Message}");
-            }
-
             var country = new ObservedCountry();
 
             try
             {
+                var observed = await _countryService.GetAllObservedCountriesAsync();
+                bool alreadyExists = observed?.Any(o => o.Cca3 == item.Cca3) ?? false;
+
+                if(alreadyExists)
+                {
+                    return Conflict($"{item.Cca3} is already in your collection.");
+                }
+
+                var response = await _apiService.GetCountryBaseData(item.Cca3);
+
+                if(!response.Success || response.Data.ValueKind != JsonValueKind.Object)
+                {
+                    return StatusCode(response.StatusCode, $"API error: {response.Data}, {response.Message}");
+                }
+
                 var countryData = response.Data.Deserialize<CountryBaseDataResponse>();
 
                 if(countryData is null || string.IsNullOrWhiteSpace(countryData.Cca3))
@@ -146,15 +146,130 @@ namespace DetailedCountries.Server.Controllers
                 country.CountryOfficialName = countryData.Name.Official;
                 country.CountryFlag = countryData.Flags.Svg;
                 country.FlagAltText = countryData.Flags.Alt;
+
+                await _countryService.AddObservedCountryAsync(country);
             }
             catch(JsonException ex)
             {
                 return StatusCode(500, $"Error parsing API response: {ex.Message}");
             }
-
-            await _countryService.AddObservedCountryAsync(country);
+            catch(MongoException ex)
+            {
+                return StatusCode(503, $"Database unavailable: {ex.Message}");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
 
             return Ok(country);
+        }
+
+        [HttpPut("edit/{cca3}")]
+        public async Task<IActionResult> EditObservedCountry(string cca3, [FromBody] CountryListItem updated)
+        {
+            if(string.IsNullOrWhiteSpace(cca3) || updated is null || string.IsNullOrWhiteSpace(updated.Cca3))
+            {
+                return BadRequest("Invalid input data.");
+            }
+
+            var country = new ObservedCountry();
+
+            try
+            {
+                var observed = await _countryService.GetAllObservedCountriesAsync();
+                bool alreadyExists = observed?.Any(o => o.Cca3 == updated.Cca3) ?? false;
+
+                if(alreadyExists)
+                {
+                    return Conflict($"{updated.Cca3} is already in your collection.");
+                }
+
+                var oldCountry = await _countryService.GetObservedCountryByCode(cca3);
+
+                if(oldCountry is null)
+                {
+                    return NotFound($"No observed country found with code: {cca3}");
+                }
+
+                var response = await _apiService.GetCountryBaseData(updated.Cca3);
+
+                if(!response.Success || response.Data.ValueKind != JsonValueKind.Object)
+                {
+                    return StatusCode(response.StatusCode, $"API error: {response.Data}, {response.Message}");
+                }
+
+                var countryData = response.Data.Deserialize<CountryBaseDataResponse>();
+
+                if(countryData is null || string.IsNullOrWhiteSpace(countryData.Cca3))
+                {
+                    return NotFound($"Country code: '{updated.Cca3}' not found in API response.");
+                }
+
+                if(string.IsNullOrEmpty(countryData.Name.Common) || string.IsNullOrWhiteSpace(countryData.Name.Official))
+                {
+                    return NotFound($"Country name data for '{updated.Cca3}' is incomplete in API response.");
+                }
+
+                if(string.IsNullOrEmpty(countryData.Flags.Svg) || string.IsNullOrEmpty(countryData.Flags.Alt))
+                {
+                    return NotFound($"Country flag data for '{updated.Cca3}' is incomplete in API response.");
+                }
+
+                country.Id = oldCountry.Id;
+                country.Cca3 = countryData.Cca3;
+                country.CountryCommonName = countryData.Name.Common;
+                country.CountryOfficialName = countryData.Name.Official;
+                country.CountryFlag = countryData.Flags.Svg;
+                country.FlagAltText = countryData.Flags.Alt;
+
+                await _countryService.EditObservedCountryAsync(country.Id, country);
+            }
+            catch(JsonException ex)
+            {
+                return StatusCode(500, $"Error parsing API response: {ex.Message}");
+            }
+            catch(MongoException ex)
+            {
+                return StatusCode(503, $"Database unavailable: {ex.Message}");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
+
+            return Ok(country);
+        }
+
+        [HttpDelete("remove/{cca3}")]
+        public async Task<IActionResult> RemoveObservedCountry(string cca3)
+        {
+            if(string.IsNullOrWhiteSpace(cca3))
+            {
+                return BadRequest("Country code is required.");
+            }
+
+            try
+            {
+                var country = await _countryService.GetObservedCountryByCode(cca3);
+                
+                if(country is null)
+                {
+                    return NotFound($"No observed country found with code: {cca3}");
+                }
+
+                await _countryService.RemoveObservedCountryAsync(country.Id);
+            }
+            catch(MongoException ex)
+            {
+                return StatusCode(503, $"Database unavailable: {ex.Message}");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
+
+            return NoContent();
         }
     }
 }

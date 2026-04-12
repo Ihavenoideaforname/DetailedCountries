@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { count, takeUntil } from 'rxjs/operators';
 import { Title } from '@angular/platform-browser';
 import { CountryService, CountryListItem, ObservedCountry } from '../../services/country.service';
 
@@ -170,5 +170,39 @@ export class CountriesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.error = 'Country added but failed to refresh. Please reload.';
         }
       });
+  }
+
+  onCountryChanged(country: CountryListItem) {
+    console.log('Changed: ', country);
+    const oldCode = this.selectedCountry!.Code;
+    this.countryService.getObservedByCode(country.Code)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (observed) => {
+          const index = this.allCountries.findIndex(c => c.Code === oldCode);
+
+          if (index !== -1) {
+            this.allCountries[index] = observed;
+            this.applyFilters();
+          }
+
+          this.showEditModal = false;
+          this.selectedCountry = null;
+        },
+        error: (err) => {
+          console.log('Error fetching observed country after edit:', err);
+          this.showEditModal = false;
+          this.selectedCountry = null;
+          this.error = 'Country updated but failed to refresh. Please reload.';
+        }
+      });
+  }
+
+  onCountryDeleted(code: string) {
+    console.log('Deleted: ', code);
+    this.allCountries = this.allCountries.filter(c => c.Code !== code);
+    this.showDeleteModal = false;
+    this.selectedCountry = null;
+    this.applyFilters();
   }
 }

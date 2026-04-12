@@ -1,0 +1,25 @@
+<div class="overlay" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2 class="modal-title">Remove Country</h2>
+    <div class="current-country">
+      <span>Are you sure you want to remove</span>
+      <span class="current-country-info">
+        <span class="flag-wrapper current-flag">
+          <img class="flag" [src]="country.Flag" [alt]="country.Alt" />
+        </span>
+        <strong>{{ country.Name }}</strong>
+      </span>
+      <span>from observed countries?</span>
+    </div>
+
+    <p *ngIf="deleteError" class="delete-error">{{ deleteError }}</p>
+
+    <div class="modal-actions">
+      <button class="btn-close" (click)="close()">Close</button>
+      <button class="btn-delete" [disabled]="deleting" (click)="delete()">
+        <span *ngIf="!deleting">Remove</span>
+        <span *ngIf="deleting" class="spinner"></span>
+      </button>
+    </div>
+  </div>
+</div>

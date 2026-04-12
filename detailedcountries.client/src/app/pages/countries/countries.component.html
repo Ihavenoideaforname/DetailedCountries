@@ -50,3 +50,9 @@
 </div>
 
 <app-add-country-modal *ngIf="showAddModal" (closed)="showAddModal = false" (countryAdded)="onCountryAdded($event)"/>
+
+<app-edit-country-modal *ngIf="showEditModal && selectedCountry" [country]="selectedCountry!"
+                        (closed)="showEditModal = false" (countryEdited)="onCountryChanged($event)"/>
+
+<app-remove-country-modal *ngIf="showDeleteModal && selectedCountry" [country]="selectedCountry!"
+                          (closed)="showDeleteModal = false" (countryDeleted)="onCountryDeleted($event)" />

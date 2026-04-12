@@ -1,7 +1,16 @@
 <div class="overlay" (click)="close()">
   <div class="modal" (click)="$event.stopPropagation()">
 
-    <h2 class="modal-title">Observe Country</h2>
+    <h2 class="modal-title">Change Country</h2>
+    <p class="current-country">
+      Your current country:
+      <span class="current-country-info">
+        <span class="flag-wrapper current-flag">
+          <img class="flag" [src]="country.Flag" [alt]="country.Alt" />
+        </span>
+        <strong>{{ country.Name }}</strong>
+      </span>
+    </p>
 
     <input class="search-input" type="text" placeholder="Search..." [(ngModel)]="searchQuery" />
 
@@ -25,15 +34,16 @@
       </ul>
     </div>
 
-    <p *ngIf="addError" class="add-error">{{ addError }}</p>
+    <p *ngIf="editError" class="edit-error">{{ editError }}</p>
 
     <div class="modal-actions">
       <button class="btn-close" (click)="close()">Close</button>
-      <button class="btn-observe" [disabled]="!selected || adding" (click)="add()">
-        <span *ngIf="!adding">Observe</span>
-        <span *ngIf="adding" class="spinner"></span>
+      <button class="btn-edit" [disabled]="!selected || editing" (click)="edit()">
+        <span *ngIf="!editing">Change</span>
+        <span *ngIf="editing" class="spinner"></span>
       </button>
     </div>
 
   </div>
 </div>
+

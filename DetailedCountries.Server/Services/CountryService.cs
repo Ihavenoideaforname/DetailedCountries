@@ -15,6 +15,8 @@ namespace DetailedCountries.Server.Services
         Task<List<ObservedCountry>> GetAllObservedCountriesAsync();
         Task<ObservedCountry> GetObservedCountryByCode(string cca3);
         Task AddObservedCountryAsync(ObservedCountry country);
+        Task EditObservedCountryAsync(string id, ObservedCountry country);
+        Task RemoveObservedCountryAsync(string id);
     }
 
     public class CountryService : ICountryService
@@ -50,5 +52,11 @@ namespace DetailedCountries.Server.Services
 
         public async Task AddObservedCountryAsync(ObservedCountry country) =>
             await _observedCountryCollection.InsertOneAsync(country);
+
+        public async Task EditObservedCountryAsync(string id, ObservedCountry country) =>
+            await _observedCountryCollection.ReplaceOneAsync(c => c.Id == id, country);
+
+        public async Task RemoveObservedCountryAsync(string id) =>
+            await _observedCountryCollection.DeleteOneAsync(c => c.Id == id);
     }
 }
