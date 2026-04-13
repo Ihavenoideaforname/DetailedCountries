@@ -14,6 +14,8 @@ import { CountriesComponent } from './pages/countries/countries.component';
 import { CountryCardComponent } from './components/country-card/country-card.component';
 import { EditCountryModalComponent } from './components/edit-country-modal/edit-country-modal.component';
 import { RemoveCountryModalComponent } from './components/remove-country-modal/remove-country-modal.component';
+import { CountryComponent } from './pages/country/country.component';
+import { ErrorComponent } from './pages/error/error.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { RemoveCountryModalComponent } from './components/remove-country-modal/r
     CountriesComponent,
     CountryCardComponent,
     EditCountryModalComponent,
-    RemoveCountryModalComponent
+    RemoveCountryModalComponent,
+    CountryComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,

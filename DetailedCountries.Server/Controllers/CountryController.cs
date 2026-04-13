@@ -97,6 +97,61 @@ namespace DetailedCountries.Server.Controllers
             }
         }
 
+        [HttpGet("details/{cca3}")]
+        public async Task<IActionResult> GetObservedCountryDetails(string cca3)
+        {
+            if(string.IsNullOrWhiteSpace(cca3))
+            {
+                return BadRequest("Country code is required.");
+            }
+
+            try
+            {
+                var available = await _countryService.GetAllListItemAsync();
+                var observed = await _countryService.GetAllObservedCountriesAsync();
+
+                if(available.Find(c => c.Cca3 == cca3) is null)
+                {
+                    return NotFound($"Country code: '{cca3}' not found in available countries.");
+                }
+
+                if(observed.Find(c => c.Cca3 == cca3) is null)
+                {
+                    return NotFound($"Country code: '{cca3}' not found in observed countries.");
+                }
+
+                var response = await _apiService.GetCountryDetailsAsync(cca3);
+
+                if(!response.Success || response.Data.ValueKind != JsonValueKind.Array)
+                {
+                    return StatusCode(response.StatusCode, $"API error: {response.Data}, {response.Message}");
+                }
+
+                var countryData = response.Data.Deserialize<List<Country>>();
+
+                if(countryData is null || countryData.Count == 0)
+                {
+                    return NotFound($"Country code: '{cca3}' not found in API response.");
+                }
+
+                var country = countryData[0];
+
+                return Ok(country);
+            }
+            catch(JsonException ex)
+            {
+                return StatusCode(500, $"Error parsing API response: {ex.Message}");
+            }
+            catch(MongoException ex)
+            {
+                return StatusCode(503, $"Database unavailable: {ex.Message}");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
+        }
+
         [HttpPost("observe")]
         public async Task<IActionResult> Observe([FromBody] CountryListItem item)
         {
@@ -104,8 +159,6 @@ namespace DetailedCountries.Server.Controllers
             {
                 return BadRequest("Invalid country data.");
             }
-
-            var country = new ObservedCountry();
 
             try
             {
@@ -117,7 +170,7 @@ namespace DetailedCountries.Server.Controllers
                     return Conflict($"{item.Cca3} is already in your collection.");
                 }
 
-                var response = await _apiService.GetCountryBaseData(item.Cca3);
+                var response = await _apiService.GetCountryBaseDataAsync(item.Cca3);
 
                 if(!response.Success || response.Data.ValueKind != JsonValueKind.Object)
                 {
@@ -141,6 +194,7 @@ namespace DetailedCountries.Server.Controllers
                     return NotFound($"Country flag data for '{item.Cca3}' is incomplete in API response.");
                 }
 
+                var country = new ObservedCountry();
                 country.Cca3 = countryData.Cca3;
                 country.CountryCommonName = countryData.Name.Common;
                 country.CountryOfficialName = countryData.Name.Official;
@@ -148,6 +202,8 @@ namespace DetailedCountries.Server.Controllers
                 country.FlagAltText = countryData.Flags.Alt;
 
                 await _countryService.AddObservedCountryAsync(country);
+
+                return Ok(country);
             }
             catch(JsonException ex)
             {
@@ -161,8 +217,6 @@ namespace DetailedCountries.Server.Controllers
             {
                 return StatusCode(500, $"Unexpected error: {ex.Message}");
             }
-
-            return Ok(country);
         }
 
         [HttpPut("edit/{cca3}")]
@@ -172,8 +226,6 @@ namespace DetailedCountries.Server.Controllers
             {
                 return BadRequest("Invalid input data.");
             }
-
-            var country = new ObservedCountry();
 
             try
             {
@@ -192,7 +244,7 @@ namespace DetailedCountries.Server.Controllers
                     return NotFound($"No observed country found with code: {cca3}");
                 }
 
-                var response = await _apiService.GetCountryBaseData(updated.Cca3);
+                var response = await _apiService.GetCountryBaseDataAsync(updated.Cca3);
 
                 if(!response.Success || response.Data.ValueKind != JsonValueKind.Object)
                 {
@@ -216,6 +268,7 @@ namespace DetailedCountries.Server.Controllers
                     return NotFound($"Country flag data for '{updated.Cca3}' is incomplete in API response.");
                 }
 
+                var country = new ObservedCountry();
                 country.Id = oldCountry.Id;
                 country.Cca3 = countryData.Cca3;
                 country.CountryCommonName = countryData.Name.Common;
@@ -224,6 +277,8 @@ namespace DetailedCountries.Server.Controllers
                 country.FlagAltText = countryData.Flags.Alt;
 
                 await _countryService.EditObservedCountryAsync(country.Id, country);
+
+                return Ok(country);
             }
             catch(JsonException ex)
             {
@@ -237,8 +292,6 @@ namespace DetailedCountries.Server.Controllers
             {
                 return StatusCode(500, $"Unexpected error: {ex.Message}");
             }
-
-            return Ok(country);
         }
 
         [HttpDelete("remove/{cca3}")]
@@ -259,6 +312,8 @@ namespace DetailedCountries.Server.Controllers
                 }
 
                 await _countryService.RemoveObservedCountryAsync(country.Id);
+
+                return NoContent();
             }
             catch(MongoException ex)
             {
@@ -268,8 +323,6 @@ namespace DetailedCountries.Server.Controllers
             {
                 return StatusCode(500, $"Unexpected error: {ex.Message}");
             }
-
-            return NoContent();
         }
     }
 }

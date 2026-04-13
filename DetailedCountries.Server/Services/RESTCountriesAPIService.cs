@@ -8,7 +8,8 @@ namespace DetailedCountries.Server.Services
     public interface IRESTCountriesAPIService
     {
         Task<APIResult<JsonElement>> GetAvaiableCountriesAsync();
-        Task<APIResult<JsonElement>> GetCountryBaseData(string cca3);
+        Task<APIResult<JsonElement>> GetCountryBaseDataAsync(string cca3);
+        Task<APIResult<JsonElement>> GetCountryDetailsAsync(string cca3);
     }
 
     public class RESTCountriesAPIService : IRESTCountriesAPIService
@@ -28,8 +29,11 @@ namespace DetailedCountries.Server.Services
         public async Task<APIResult<JsonElement>> GetAvaiableCountriesAsync() =>
             await FetchRESTCountriesAsync($"{_apiUrl}all?fields=name,flags,cca3");
 
-        public async Task<APIResult<JsonElement>> GetCountryBaseData(string cca3) =>
+        public async Task<APIResult<JsonElement>> GetCountryBaseDataAsync(string cca3) =>
             await FetchRESTCountriesAsync($"{_apiUrl}alpha/{cca3}?fields=name,flags,cca3");
+
+        public async Task<APIResult<JsonElement>> GetCountryDetailsAsync(string cca3) =>
+            await FetchRESTCountriesAsync($"{_apiUrl}alpha/{cca3}");
 
         private async Task<APIResult<JsonElement>> FetchRESTCountriesAsync(string apiUrl)
         {
