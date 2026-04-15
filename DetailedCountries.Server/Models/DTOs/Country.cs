@@ -5,6 +5,8 @@ namespace DetailedCountries.Server.Models.DTOs
 {
     public class Country
     {
+        // Codes
+
         [JsonPropertyName("tld")]
         public List<string>? Tld { get; set; }
 
@@ -20,6 +22,8 @@ namespace DetailedCountries.Server.Models.DTOs
         [JsonPropertyName("cioc")]
         public string? Cioc { get; set; }
 
+        // Status
+
         [JsonPropertyName("independent")]
         public bool Independent { get; set; }
 
@@ -31,6 +35,8 @@ namespace DetailedCountries.Server.Models.DTOs
 
         [JsonPropertyName("idd")]
         public Idd? Idd { get; set; }
+
+        // Geography
 
         [JsonPropertyName("capital")]
         public List<string>? Capital { get; set; }
@@ -50,9 +56,6 @@ namespace DetailedCountries.Server.Models.DTOs
         [JsonPropertyName("area")]
         public double Area { get; set; }
 
-        [JsonPropertyName("maps")]
-        public Maps? Maps { get; set; }
-
         [JsonPropertyName("population")]
         public long Population { get; set; }
 
@@ -61,6 +64,8 @@ namespace DetailedCountries.Server.Models.DTOs
 
         [JsonPropertyName("continents")]
         public List<string>? Continents { get; set; }
+
+        // Names
 
         [JsonPropertyName("name")]
         public FullName? Name { get; set; }
@@ -76,6 +81,9 @@ namespace DetailedCountries.Server.Models.DTOs
 
         [JsonPropertyName("languages")]
         public Dictionary<string, string>? Languages { get; set; }
+
+        [JsonPropertyName("gini")]
+        public Dictionary<string, double>? Gini { get; set; }
 
         [JsonPropertyName("flags")]
         public Flags? Flags { get; set; }
@@ -94,12 +102,6 @@ namespace DetailedCountries.Server.Models.DTOs
 
         [JsonPropertyName("suffixes")]
         public List<string>? Suffixes { get; set; }
-    }
-
-    public class Maps
-    {
-        [JsonPropertyName("openStreetMaps")]
-        public string? OpenStreetMaps { get; set; }
     }
 
     public class FullName

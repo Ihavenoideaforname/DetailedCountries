@@ -1,0 +1,395 @@
+.page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(74, 158, 190, 0.2);
+  border-radius: 20px;
+  max-width: 520px;
+  width: 100%;
+  justify-self: center;
+}
+
+.state-icon {
+  font-size: 3rem;
+}
+
+.state-box h2 {
+  font-family: Georgia, serif;
+  font-size: 1.4rem;
+  color: #2c3e4a;
+}
+
+.state-box p {
+  font-family: sans-serif;
+  font-size: 0.9rem;
+  color: #7a95a3;
+}
+
+.spinner-large {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(74, 158, 190, 0.2);
+  border-top-color: #4a9ebe;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-primary {
+  padding: 0.6rem 1.5rem;
+  background: #4a9ebe;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+}
+
+.btn-secondary {
+  padding: 0.6rem 1.5rem;
+  background: transparent;
+  color: #2d7a9a;
+  border: 1px solid rgba(74, 158, 190, 0.3);
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(74, 158, 190, 0.08);
+}
+
+.country-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.flag-wrapper {
+  background: #f0f8fc;
+  border: 1px solid rgba(74, 158, 190, 0.15);
+  border-radius: 10px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+}
+
+.flag-wrapper img {
+  width: 100%;
+  height: auto;
+  max-height: 110px;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
+}
+
+.coat-of-arms {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coat-of-arms img {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+}
+
+.header-names {
+  flex: 1;
+  min-width: 200px;
+}
+
+.common-name {
+  font-family: Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c3e4a;
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
+}
+
+.official-name {
+  font-family: sans-serif;
+  font-size: 0.95rem;
+  color: #7a95a3;
+  margin: 0 0 0.35rem;
+}
+
+.native-name {
+  font-style: italic;
+  color: #7a95a3;
+  font-size: 0.9em;
+}
+
+.native-lang {
+  font-family: sans-serif;
+  font-size: 0.75rem;
+  color: #aac4d0;
+  margin: 0 0 0.75rem;
+}
+
+.header-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.badge {
+  font-family: sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+
+.badge-blue {
+  background: rgba(74,158,190,0.12);
+  color: #2d7a9a;
+}
+
+.badge-green {
+  background: rgba(106,171,126,0.12);
+  color: #4a8a5e;
+}
+
+.badge-sand {
+  background: rgba(200,169,110,0.15);
+  color: #8b6f3e;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: row;
+  align-self: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.header-actions button {
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-delete {
+  background: rgba(192, 57, 43, 0.08);
+  color: #c0392b;
+  border-color: rgba(192, 57, 43, 0.2) !important;
+}
+
+.btn-delete:hover {
+  background: rgba(192, 57, 43, 0.15);
+}
+
+.btn-edit {
+  background: rgba(74, 158, 190, 0.08);
+  color: #2d7a9a;
+  border-color: rgba(74, 158, 190, 0.2) !important;
+}
+
+.btn-edit:hover {
+  background: rgba(74, 158, 190, 0.15);
+}
+
+.map-weather-row {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: stretch;
+}
+
+.map-container {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(74, 158, 190, 0.15);
+  height: 320px;
+  z-index: 0;
+  position: relative;
+}
+
+#country-map {
+  width: 100%;
+  height: 100%;
+}
+
+.sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: start;
+}
+
+.section-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(74, 158, 190, 0.15);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.section-title {
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c3e4a;
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(74, 158, 190, 0.1);
+}
+
+.neighbours-card {
+  margin-bottom: 2rem;
+}
+
+.neighbours-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.neighbour-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(74,158,190,0.07);
+  border: 1px solid rgba(74,158,190,0.2);
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 0.8rem;
+  color: #2d7a9a;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.neighbour-btn:hover:not(:disabled) {
+  background: rgba(74,158,190,0.14);
+}
+
+.neighbour-btn.observed {
+  border-color: rgba(106,171,126,0.3);
+  color: #4a8a5e;
+  background: rgba(106,171,126,0.07);
+}
+
+.neighbour-btn.observed:hover {
+  background: rgba(106,171,126,0.14);
+}
+
+.neighbour-btn.adding {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.neighbour-flag {
+  width: 20px;
+  height: auto;
+  max-height: 14px;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.neighbour-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #4a9ebe;
+}
+
+.neighbour-badge.add {
+  color: #6aab7e;
+}
+
+.neighbour-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid rgba(74,158,190,0.3);
+  border-top-color: #4a9ebe;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@media (max-width: 900px) {
+  .map-weather-row {
+    grid-template-columns: 1fr;
+  }
+
+  .map-container {
+    height: 260px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .common-name {
+    font-size: 1.3rem;
+  }
+
+  .sections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .country-header {
+    gap: 1rem;
+  }
+
+  .flag-wrapper {
+    width: 120px;
+  }
+
+  .header-actions {
+    flex-direction: row;
+  }
+}

@@ -11,6 +11,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\browser\favicon.ico" />
+    <Content Remove="wwwroot\browser\index.html" />
+    <Content Remove="wwwroot\browser\main-YJRSYYJQ.js" />
+    <Content Remove="wwwroot\browser\media\layers-2x-TBM42ERR.png" />
+    <Content Remove="wwwroot\browser\media\layers-55W3Q4RM.png" />
+    <Content Remove="wwwroot\browser\media\marker-icon-2V3QKKVC.png" />
+    <Content Remove="wwwroot\browser\polyfills-FFHMD2TL.js" />
+    <Content Remove="wwwroot\browser\styles-JP2SUF7V.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\browser\favicon.ico" />
+    <None Include="wwwroot\browser\index.html" />
+    <None Include="wwwroot\browser\main-YJRSYYJQ.js" />
+    <None Include="wwwroot\browser\media\layers-2x-TBM42ERR.png" />
+    <None Include="wwwroot\browser\media\layers-55W3Q4RM.png" />
+    <None Include="wwwroot\browser\media\marker-icon-2V3QKKVC.png" />
+    <None Include="wwwroot\browser\polyfills-FFHMD2TL.js" />
+    <None Include="wwwroot\browser\styles-JP2SUF7V.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>8.*-*</Version>
     </PackageReference>

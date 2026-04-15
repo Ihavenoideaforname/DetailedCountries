@@ -1,0 +1,71 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 62, 74, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(74, 158, 190, 0.2);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 380px;
+  max-width: 90vw;
+}
+
+.modal-title {
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2c3e4a;
+  margin: 0 0 1rem;
+}
+
+.modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modal-list li {
+  font-family: sans-serif;
+  font-size: 0.85rem;
+  color: #2c3e4a;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid rgba(74, 158, 190, 0.08);
+}
+
+.modal-list li:last-child {
+  border-bottom: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-close {
+  padding: 0.55rem 1.25rem;
+  background: transparent;
+  border: 1px solid rgba(74, 158, 190, 0.3);
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 0.82rem;
+  color: #7a95a3;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-close:hover {
+  background: rgba(74, 158, 190, 0.07);
+}

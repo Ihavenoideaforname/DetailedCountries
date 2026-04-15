@@ -3,8 +3,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
+
 import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -16,6 +16,9 @@ import { EditCountryModalComponent } from './components/edit-country-modal/edit-
 import { RemoveCountryModalComponent } from './components/remove-country-modal/remove-country-modal.component';
 import { CountryComponent } from './pages/country/country.component';
 import { ErrorComponent } from './pages/error/error.component';
+import { SectionCardComponent } from './components/section-card/section-card.component';
+import { DataModalComponent } from './components/data-modal/data-modal.component';
+import { WeatherCardComponent } from './components/weather-card/weather-card.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,10 @@ import { ErrorComponent } from './pages/error/error.component';
     EditCountryModalComponent,
     RemoveCountryModalComponent,
     CountryComponent,
-    ErrorComponent
+    ErrorComponent,
+    SectionCardComponent,
+    DataModalComponent,
+    WeatherCardComponent
   ],
   imports: [
     BrowserModule,

@@ -1,1 +1,120 @@
-<p>country works!</p>
+<div class="page">
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="state-box">
+    <div class="spinner-large"></div>
+    <p>Loading country details...</p>
+  </div>
+
+  <!-- Not found -->
+  <div *ngIf="notFound && !loading" class="state-box">
+    <div class="state-icon">🌐</div>
+    <h2>Country not found</h2>
+    <p>This country doesn't exist in our database.</p>
+    <button class="btn-primary" (click)="goToCountries()">← Back to Countries</button>
+  </div>
+
+  <!-- Not observed -->
+  <div *ngIf="notObserved && !loading" class="state-box">
+    <div class="state-icon">🌍</div>
+    <h2>Country not observed</h2>
+    <p>You haven't added this country to your collection yet.</p>
+    <button class="btn-primary" (click)="observeThisCountry()">+ Observe this Country</button>
+    <button class="btn-secondary" (click)="goToCountries()">← Back to Countries</button>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="state-box">
+    <div class="state-icon">⚠️</div>
+    <h2>Something went wrong</h2>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="goToCountries()">← Back to Countries</button>
+  </div>
+
+  <ng-container *ngIf="country && !loading">
+
+    <!-- Header -->
+    <div class="country-header">
+      <div class="flag-wrapper">
+        <img [src]="country.flagSvg" [alt]="country.flagAlt ?? country.commonName + ' flag'" />
+      </div>
+
+      <div class="header-left">
+        <div class="coat-of-arms" *ngIf="country.coatOfArmsSvg">
+          <img [src]="country.coatOfArmsSvg" [alt]="country.coatOfArmsAlt ?? 'Coat of arms'" />
+        </div>
+      </div>
+
+      <div class="header-names">
+        <h1 class="common-name">
+          {{ country.commonName }}
+          <span *ngIf="country.nativeCommonName && country.nativeCommonName !== country.commonName"
+                class="native-name">/ {{ country.nativeCommonName }}</span>
+        </h1>
+        <p class="official-name">
+          {{ country.officialName }}
+          <span *ngIf="country.nativeOfficialName && country.nativeOfficialName !== country.officialName"
+                class="native-name">/ {{ country.nativeOfficialName }}</span>
+        </p>
+        <p *ngIf="country.nativeLanguage" class="native-lang">
+          Native language: {{ country.nativeLanguage }}
+        </p>
+        <div class="header-badges">
+          <span class="badge badge-blue" *ngIf="country.unMember">UN Member</span>
+          <span class="badge badge-green" *ngIf="country.independent">Independent</span>
+          <span class="badge badge-sand" *ngIf="country.landlocked">Landlocked</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-edit" (click)="openEdit()">Change Country</button>
+        <button class="btn-delete" (click)="openDelete()">Remove Country</button>
+      </div>
+    </div>
+
+    <!-- Map & Weather -->
+    <div class="map-weather-row">
+      <div class="map-container">
+        <div #mapContainer id="country-map"></div>
+      </div>
+      <app-weather-card [weather]="country.weather" [capital]="country.capital" [commonName]="country.commonName"/>
+    </div>
+
+    <!-- Country Data Sections -->
+    <div class="sections-grid">
+      <app-section-card title="Geography" [rows]="geographyRows"/>
+      <app-section-card title="Demographics" [rows]="demographicsRows"/>
+      <app-section-card title="Political" [rows]="politicalRows"/>
+      <app-section-card title="Codes" [rows]="codesRows"/>
+      <app-section-card title="Finances" [rows]="financesRows"/>
+    </div>
+
+    <!-- Neighbour Countries -->
+    <div class="section-card neighbours-card" *ngIf="country.neighbours.length > 0">
+      <h3 class="section-title">Neighbouring Countries</h3>
+      <div class="neighbours-grid">
+        <button *ngFor="let n of country.neighbours" class="neighbour-btn"
+                [class.observed]="n.isObserved" [class.adding]="addingNeighbour === n.code"
+                [disabled]="addingNeighbour === n.code" (click)="openNeighbour(n)">
+          <img *ngIf="n.listItem?.Flag" class="neighbour-flag"
+               [src]="n.listItem!.Flag" [alt]="n.listItem!.Name" />
+          <span>{{ n.listItem?.Name ?? n.code }}</span>
+          <span class="neighbour-badge" *ngIf="n.isObserved">→</span>
+          <span class="neighbour-badge add" *ngIf="!n.isObserved && addingNeighbour !== n.code">+</span>
+          <span class="neighbour-spinner" *ngIf="addingNeighbour === n.code"></span>
+        </button>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
+
+<!-- Modals -->
+<app-data-modal *ngIf="showModal" [title]="modalTitle" [items]="modalItems"
+                (closed)="showModal = false"/>
+
+<app-edit-country-modal *ngIf="showEditModal && currentCountry" [country]="currentCountry!"
+                        (closed)="showEditModal = false" (countryEdited)="onCountryChanged($event)"/>
+
+<app-remove-country-modal *ngIf="showDeleteModal && currentCountry" [country]="currentCountry!"
+                          (closed)="showDeleteModal = false" (countryDeleted)="onCountryDeleted($event)"/>

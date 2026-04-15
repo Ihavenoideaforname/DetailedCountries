@@ -1,0 +1,46 @@
+<div class="weather-card" *ngIf="weather; else noWeather">
+  <h3 class="section-title">Weather in {{ locationLabel }}</h3>
+
+  <div class="weather-sections">
+    <!-- General -->
+    <div class="weather-section">
+      <span class="weather-label">General</span>
+      <span class="weather-value">{{ isDayOrNight }} · {{ weather.condition }}</span>
+    </div>
+
+    <!-- Temperature -->
+    <div class="weather-section">
+      <span class="weather-label">Temperature</span>
+      <span class="weather-temp">{{ weather.temperature }}°C</span>
+    </div>
+
+    <!-- Wind -->
+    <div class="weather-section">
+      <span class="weather-label">Wind</span>
+      <div class="wind-row">
+        <svg class="compass" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="28" fill="#f0f8fc" stroke="rgba(74,158,190,0.3)" stroke-width="1.5" />
+          <text x="30" y="10" text-anchor="middle" font-size="7" fill="#7a95a3" font-family="sans-serif">N</text>
+          <text x="30" y="56" text-anchor="middle" font-size="7" fill="#7a95a3" font-family="sans-serif">S</text>
+          <text x="6" y="33" text-anchor="middle" font-size="7" fill="#7a95a3" font-family="sans-serif">W</text>
+          <text x="54" y="33" text-anchor="middle" font-size="7" fill="#7a95a3" font-family="sans-serif">E</text>
+          <g [attr.transform]="'rotate(' + weather.windDirection + ', 30, 30)'">
+            <polygon points="30,8 33,30 30,26 27,30" fill="#4a9ebe" />
+            <polygon points="30,52 33,30 30,34 27,30" fill="rgba(74,158,190,0.3)" />
+          </g>
+        </svg>
+        <div class="wind-info">
+          <span class="weather-value">{{ weather.windspeed }} km/h</span>
+          <span class="wind-dir">{{ windDirectionLabel }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #noWeather>
+  <div class="weather-card unavailable">
+    <h3 class="section-title">Weather</h3>
+    <p>No weather data available.</p>
+  </div>
+</ng-template>

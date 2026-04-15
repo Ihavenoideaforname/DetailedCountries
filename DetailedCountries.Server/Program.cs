@@ -9,6 +9,7 @@ builder.Services.AddHttpClient();
 builder.Services.Configure<DetailedCountriesDBSettings>(builder.Configuration.GetSection("DetailedCountriesDB"));
 
 builder.Services.AddSingleton<IRESTCountriesAPIService, RESTCountriesAPIService>();
+builder.Services.AddSingleton<IOpenMeteoAPIService, OpenMeteoAPIService>();
 builder.Services.AddSingleton<ICountryService, CountryService>();
 
 builder.Services.AddHostedService<CountrySyncService>();
@@ -30,8 +31,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowAngularClient");
+
 app.UseDefaultFiles();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "https://localhost:61230");
+    }
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -43,12 +52,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
-app.UseCors("AllowAngularClient");
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapFallbackToFile("/index.html");
+app.MapFallbackToFile("/browser/index.html");
 
 app.Run();

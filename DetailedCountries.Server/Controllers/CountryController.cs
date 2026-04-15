@@ -13,11 +13,13 @@ namespace DetailedCountries.Server.Controllers
     {
         private readonly ICountryService _countryService;
         private readonly IRESTCountriesAPIService _apiService;
+        private readonly IOpenMeteoAPIService _weatherService;
 
-        public CountryController(ICountryService countryService, IRESTCountriesAPIService apiService)
+        public CountryController(ICountryService countryService, IRESTCountriesAPIService apiService, IOpenMeteoAPIService weatherService)
         {
             _countryService = countryService;
             _apiService = apiService;
+            _weatherService = weatherService;
         }
 
         [HttpGet("available")]
@@ -107,46 +109,192 @@ namespace DetailedCountries.Server.Controllers
 
             try
             {
+                // Data avaibliity checks & API calls
                 var available = await _countryService.GetAllListItemAsync();
-                var observed = await _countryService.GetAllObservedCountriesAsync();
-
                 if(available.Find(c => c.Cca3 == cca3) is null)
                 {
-                    return NotFound($"Country code: '{cca3}' not found in available countries.");
+                    return NotFound($"Country '{cca3}' not found in available countries.");
                 }
 
-                if(observed.Find(c => c.Cca3 == cca3) is null)
+                var observed = await _countryService.GetAllObservedCountriesAsync();
+                var isObserved = observed.Find(c => c.Cca3 == cca3) is not null;
+                if(!isObserved)
                 {
-                    return NotFound($"Country code: '{cca3}' not found in observed countries.");
+                    return StatusCode(403, $"Country '{cca3}' is not observed.");
                 }
 
                 var response = await _apiService.GetCountryDetailsAsync(cca3);
-
                 if(!response.Success || response.Data.ValueKind != JsonValueKind.Array)
                 {
-                    return StatusCode(response.StatusCode, $"API error: {response.Data}, {response.Message}");
+                    return StatusCode(response.StatusCode, $"API error: {response.Message}");
                 }
 
                 var countryData = response.Data.Deserialize<List<Country>>();
-
                 if(countryData is null || countryData.Count == 0)
                 {
-                    return NotFound($"Country code: '{cca3}' not found in API response.");
+                    return NotFound($"Country '{cca3}' not found in API response.");
                 }
 
-                var country = countryData[0];
+                var c = countryData[0];
 
-                return Ok(country);
+                // First Native Name
+                string? nativeCommon = null, nativeOfficial = null, nativeLang = null;
+                if(c.Name?.NativeName?.Count > 0)
+                {
+                    var first = c.Name.NativeName.First();
+                    nativeCommon = first.Value.Common;
+                    nativeOfficial = first.Value.Official;
+
+                    if(c.Languages != null && c.Languages.TryGetValue(first.Key, out var lang))
+                    {
+                        nativeLang = lang;
+                    }
+                }
+
+                // First Calling Code
+                string? callingCode = null;
+                if(c.Idd?.Root != null && c.Idd?.Suffixes?.Count > 0)
+                {
+                    callingCode = c.Idd.Root + c.Idd.Suffixes[0];
+                }
+
+                // Coat of Arms Alt Text
+                string? coatAlt = null;
+                if(c.Demonyms != null && c.Demonyms.TryGetValue("eng", out var demonym))
+                {
+                    coatAlt = $"{demonym.M} coat of arms";
+                }
+
+                // Finance - gini & currency
+                string? currencyCode = null, currencyName = null, currencySymbol = null;
+                double? gini = null;
+
+                if(c.Gini != null && c.Gini.Count > 0)
+                {
+                    var first = c.Gini.First();
+                    gini = first.Value;
+                }
+
+                if(c.Currencies != null && c.Currencies.Count > 0)
+                {
+                    var first = c.Currencies.First();
+                    currencyCode = first.Key;
+                    currencyName = first.Value.Name;
+                    currencySymbol = first.Value.Symbol;
+                }
+
+                // Weather coordinates - capital over country center
+                double? capLat = null, capLng = null;
+                if(c.CapitalInfo?.Latlng?.Count >= 2)
+                {
+                    capLat = c.CapitalInfo.Latlng[0];
+                    capLng = c.CapitalInfo.Latlng[1];
+                }
+
+                double weatherLat = capLat ?? c.Latlng?[0] ?? 0;
+                double weatherLng = capLng ?? c.Latlng?[1] ?? 0;
+                string weatherLocation = capLat.HasValue ? "capital" : "country center";
+
+                // Weather
+                WeatherData? weather = null;
+                var weatherResponse = await _weatherService.GetCurrentWeatherAsync(weatherLat, weatherLng);
+                if(weatherResponse.Success)
+                {
+                    var weatherData = weatherResponse.Data;
+
+                    if(weatherData.ValueKind == JsonValueKind.Array)
+                    {
+                        weatherData = weatherData[0];
+                    }
+
+                    if(weatherData.TryGetProperty("current_weather", out var cw))
+                    {
+                        weather = new WeatherData
+                        {
+                            Temperature = cw.TryGetProperty("temperature", out var t) ? t.GetDouble() : 0,
+                            Windspeed = cw.TryGetProperty("windspeed", out var w) ? w.GetDouble() : 0,
+                            WindDirection = cw.TryGetProperty("winddirection", out var wd) ? wd.GetDouble() : 0,
+                            IsDay = cw.TryGetProperty("is_day", out var id) && id.GetInt32() == 1,
+                            Condition = cw.TryGetProperty("weathercode", out var wc)
+                                ? _weatherService.DecodeWeatherCode(wc.GetInt32())
+                                : "Unknown",
+                            Location = weatherLocation
+                        };
+                    }
+                }
+
+                // Neighbours Data
+                var observedCodes = observed.Select(o => o.Cca3).ToHashSet();
+                var neighbours = new List<NeighbourData>();
+                if(c.Borders != null)
+                {
+                    foreach(var code in c.Borders)
+                    {
+                        var isNeighbourObserved = observedCodes.Contains(code);
+                        var listItem = available.Find(a => a.Cca3 == code);
+
+                        neighbours.Add(new NeighbourData
+                        {
+                            Code = code,
+                            IsObserved = isNeighbourObserved,
+                            ListItem = listItem
+                        });
+                    }
+                }
+
+                // Result DTO
+                var result = new CountryDetails
+                {
+                    CommonName = c.Name?.Common ?? "No data available",
+                    OfficialName = c.Name?.Official ?? "No data available",
+                    NativeCommonName = nativeCommon,
+                    NativeOfficialName = nativeOfficial,
+                    NativeLanguage = nativeLang,
+                    FlagSvg = c.Flags?.Svg,
+                    FlagAlt = c.Flags?.Alt,
+                    CoatOfArmsSvg = c.CoatOfArms?.Svg,
+                    CoatOfArmsAlt = coatAlt,
+                    Latitude = c.Latlng?.Count >= 2 ? c.Latlng[0] : null,
+                    Longitude = c.Latlng?.Count >= 2 ? c.Latlng[1] : null,
+                    Region = c.Region ?? "No data available",
+                    Subregion = c.Subregion ?? "No data available",
+                    Area = c.Area > 0 ? $"{c.Area:N0} km²" : "No data available",
+                    Landlocked = c.Landlocked,
+                    Timezones = c.Timezones ?? new(),
+                    Continents = c.Continents ?? new(),
+                    Population = c.Population > 0 ? c.Population.ToString("N0") : "No data available",
+                    Languages = c.Languages?.Values.ToList() ?? new(),
+                    Status = c.Status ?? "No data available",
+                    UnMember = c.UnMember,
+                    Independent = c.Independent,
+                    Cca2 = c.Cca2,
+                    Cca3 = c.Cca3,
+                    Ccn3 = c.Ccn3,
+                    Cioc = c.Cioc,
+                    Tld = c.Tld ?? new(),
+                    CallingCode = callingCode,
+                    Capital = c.Capital?.FirstOrDefault() ?? "No data available",
+                    CapitalLat = capLat,
+                    CapitalLng = capLng,
+                    CurrencyCode = currencyCode,
+                    CurrencyName = currencyName,
+                    CurrencySymbol = currencySymbol,
+                    Gini = gini,
+                    Weather = weather,
+                    Neighbours = neighbours
+                };
+
+                return Ok(result);
             }
-            catch(JsonException ex)
+            catch (JsonException ex)
             {
                 return StatusCode(500, $"Error parsing API response: {ex.Message}");
             }
-            catch(MongoException ex)
+            catch (MongoException ex)
             {
                 return StatusCode(503, $"Database unavailable: {ex.Message}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, $"Unexpected error: {ex.Message}");
             }

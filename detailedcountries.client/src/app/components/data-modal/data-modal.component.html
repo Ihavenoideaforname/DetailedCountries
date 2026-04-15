@@ -1,0 +1,11 @@
+<div class="overlay" (click)="closed.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2 class="modal-title">{{ title }}</h2>
+    <ul class="modal-list">
+      <li *ngFor="let item of items">{{ item }}</li>
+    </ul>
+    <div class="modal-actions">
+      <button class="btn-close" (click)="closed.emit()">Close</button>
+    </div>
+  </div>
+</div>
