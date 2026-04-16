@@ -8,6 +8,7 @@ A simple web application for exploring countries of the world.
 
 ## Used APIs
 - Country data: [REST Countries](https://restcountries.com)
+- Map data: [OpenStreetMap](https://www.openstreetmap.org)
 - Weather data: [Open-Meteo](https://open-meteo.com)
 
 ## External data
