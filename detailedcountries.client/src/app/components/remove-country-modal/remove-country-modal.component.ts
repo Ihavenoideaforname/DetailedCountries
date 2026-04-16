@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 import { CountryService, ObservedCountry } from '../../services/country.service'; 
 
 @Component({
@@ -15,10 +16,12 @@ export class RemoveCountryModalComponent {
   deleting = false;
   deleteError: string | null = null;
 
-  constructor(private countryService: CountryService) { }
+  constructor(private router: Router, private countryService: CountryService) { }
 
   delete() {
-    if (this.deleting) return;
+    if(this.deleting) {
+      return;
+    }
     this.deleting = true;
     this.deleteError = null;
     this.countryService.removeObserved(this.country.Code).subscribe({
@@ -28,12 +31,18 @@ export class RemoveCountryModalComponent {
         this.close();
       },
       error: (err) => {
-        this.deleteError = err.status === 503
-          ? 'Database unavailable. Try again later.'
-          : 'Failed to delete country.';
-        this.deleting = false;
+        if(err.status === 503) {
+          this.redirectToError(503, 'Database unavailable. Try again later.')
+        }
+        else {
+          this.redirectToError(500, 'Failed to delete country.')
+        }
       }
     });
+  }
+
+  private redirectToError(status: number, message: string) {
+    this.router.navigate(['/error'], { state: { status, message } });
   }
 
   close() {

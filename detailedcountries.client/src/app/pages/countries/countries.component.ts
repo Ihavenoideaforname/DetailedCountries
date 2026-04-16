@@ -76,10 +76,8 @@ export class CountriesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
         this.applyFilters();
       },
-      error: (err) => {
-        console.error('Error loading countries:', err);
-        this.error = 'Failed to load countries.';
-        this.loading = false;
+      error: () => {
+        this.redirectToError(500, 'Failed to load countries. Please try again later.');
       }
     });
   }
@@ -154,8 +152,11 @@ export class CountriesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/country', country.Code]);
   }
 
+  private redirectToError(status: number, message: string) {
+    this.router.navigate(['/error'], { state: { status, message } });
+  }
+
   onCountryAdded(country: CountryListItem) {
-    console.log('Added: ', country);
     this.countryService.getObservedByCode(country.Code)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -164,16 +165,13 @@ export class CountriesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.showAddModal = false;
           this.applyFilters();
         },
-        error: (err) => {
-          console.log('Error fetching observed country after add:', err);
-          this.showAddModal = false;
-          this.error = 'Country added but failed to refresh. Please reload.';
+        error: () => {
+          this.redirectToError(500, 'Country added but failed to refresh. Please reload.');
         }
       });
   }
 
   onCountryChanged(country: CountryListItem) {
-    console.log('Changed: ', country);
     const oldCode = this.selectedCountry!.Code;
     this.countryService.getObservedByCode(country.Code)
       .pipe(takeUntil(this.destroy$))
@@ -181,7 +179,7 @@ export class CountriesComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (observed) => {
           const index = this.allCountries.findIndex(c => c.Code === oldCode);
 
-          if (index !== -1) {
+          if(index !== -1) {
             this.allCountries[index] = observed;
             this.applyFilters();
           }
@@ -189,17 +187,13 @@ export class CountriesComponent implements OnInit, AfterViewInit, OnDestroy {
           this.showEditModal = false;
           this.selectedCountry = null;
         },
-        error: (err) => {
-          console.log('Error fetching observed country after edit:', err);
-          this.showEditModal = false;
-          this.selectedCountry = null;
-          this.error = 'Country updated but failed to refresh. Please reload.';
+        error: () => {
+          this.redirectToError(500, 'Country updated but failed to refresh.');
         }
       });
   }
 
   onCountryDeleted(code: string) {
-    console.log('Deleted: ', code);
     this.allCountries = this.allCountries.filter(c => c.Code !== code);
     this.showDeleteModal = false;
     this.selectedCountry = null;

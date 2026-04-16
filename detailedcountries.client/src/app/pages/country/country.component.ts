@@ -75,7 +75,7 @@ export class CountryComponent implements OnInit, AfterViewInit, OnDestroy {
             this.notObserved = true;
           }
           else {
-            this.error = 'Failed to load country details.';
+            this.redirectToError(500, 'Failed to load country details.');
           }
         }
       });
@@ -250,6 +250,10 @@ export class CountryComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
+  private redirectToError(status: number, message: string) {
+    this.router.navigate(['/error'], { state: { status, message } });
+  }
+
   observeThisCountry() {
     this.countryService.getAvailable()
       .pipe(takeUntil(this.destroy$))
@@ -263,7 +267,7 @@ export class CountryComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
               next: () => window.location.reload(),
-              error: () => this.error = 'Failed to observe country.'
+              error: () => this.redirectToError(500, 'Failed to observe country.')
             });
         }
       });

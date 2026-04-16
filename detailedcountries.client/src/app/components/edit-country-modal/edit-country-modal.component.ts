@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 import { CountryService, CountryListItem, ObservedCountry } from '../../services/country.service';
 
 @Component({
@@ -21,7 +22,7 @@ export class EditCountryModalComponent implements OnInit {
   editError: string | null = null;
   skeletonRows = Array(6).fill(0);
 
-  constructor(private countryService: CountryService) { }
+  constructor(private router: Router, private countryService: CountryService) { }
 
   ngOnInit() {
     this.loading = true;
@@ -31,10 +32,12 @@ export class EditCountryModalComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = err.status === 503
-          ? 'Database unavailable. Try again later.'
-          : 'Failed to load countries.';
-        this.loading = false;
+        if(err.status === 503) {
+          this.redirectToError(503, 'Database unavailable. Try again later.')
+        }
+        else {
+          this.redirectToError(500, 'Failed to load countries.')
+        }
       }
     });
   }
@@ -67,8 +70,15 @@ export class EditCountryModalComponent implements OnInit {
       error: (err) => {
         this.editing = false;
         this.editError = this.resolveEditError(err);
+        if(err.status >= 500) {
+          this.redirectToError(err.status, this.editError);
+        }
       }
     })
+  }
+
+  private redirectToError(status: number, message: string) {
+    this.router.navigate(['/error'], { state: { status, message } });
   }
 
   private resolveEditError(err: any): string {
@@ -76,8 +86,8 @@ export class EditCountryModalComponent implements OnInit {
       case 400: return 'Invalid country data.';
       case 409: return err.error ?? 'Country already in your collection.';
       case 502: return 'Could not verify country with external source.';
-      case 504: return 'External source timed out. Try again.';
       case 503: return 'Database unavailable. Try again later.';
+      case 504: return 'External source timed out. Try again.';
       default: return 'Something went wrong. Try again.';
     }
   }

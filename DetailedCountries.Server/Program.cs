@@ -57,6 +57,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapFallbackToFile("/browser/index.html");
+app.MapFallbackToFile("/detailedcountries.client/browser/index.html");
 
 app.Run();

@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 import { CountryService, CountryListItem } from '../../services/country.service';
 
 @Component({
@@ -20,7 +21,7 @@ export class AddCountryModalComponent implements OnInit {
   addError: string | null = null;
   skeletonRows = Array(6).fill(0);
 
-  constructor(private countryService: CountryService) { }
+  constructor(private router: Router, private countryService: CountryService) { }
 
   ngOnInit() {
     this.loading = true;
@@ -30,10 +31,12 @@ export class AddCountryModalComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = err.status === 503
-          ? 'Database unavailable. Try again later.'
-          : 'Failed to load countries.';
-        this.loading = false;
+        if(err.status === 503) {
+          this.redirectToError(503, 'Database unavailable. Try again later.')
+        }
+        else {
+          this.redirectToError(500, 'Failed to load countries.')
+        }
       }
     });
   }
@@ -66,8 +69,15 @@ export class AddCountryModalComponent implements OnInit {
       error: (err) => {
         this.adding = false;
         this.addError = this.resolveAddError(err);
+        if(err.status >= 500) {
+          this.redirectToError(err.status, this.addError);
+        }
       }
     });
+  }
+
+  private redirectToError(status: number, message: string) {
+    this.router.navigate(['/error'], { state: { status, message } });
   }
 
   private resolveAddError(err: any): string {
@@ -75,8 +85,8 @@ export class AddCountryModalComponent implements OnInit {
       case 400: return 'Invalid country data.';
       case 409: return err.error ?? 'Country already in your collection.';
       case 502: return 'Could not verify country with external source.';
-      case 504: return 'External source timed out. Try again.';
       case 503: return 'Database unavailable. Try again later.';
+      case 504: return 'External source timed out. Try again.';
       default: return 'Something went wrong. Try again.';
     }
   }
